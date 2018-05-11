@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style type="text/css">
+@import url('https://fonts.googleapis.com/css?family=Dosis');
+
+body {
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+a, a:hover, a:visited, a:active {
+    color: lightblue;
+}
+
+.remark-slide-number {
+    visibility: hidden;
+}
+
+.remark-slide-content {
+    background-color: #282828;
+}
+
+.remark-slide-content h1 {
+    font-size: 1.7em;
+    margin-bottom: 0.5em;
+}
+
+.remark-slide-content h2 {
+    font-size: 1.4em;
+    margin-bottom: 0.2em;
+}
+
+.remark-slide-content table {
+    border-collapse: collapse;
+}
+
+.remark-slide-content table td, .remark-slide-content table th {
+    border: 1px solid black;
+    padding: 0.5em;
+}
+
+    </style>
+  </head>
+  <body>
+     <textarea id="source">
+class: center, middle
+
+# Rust libp2p state of the implementation
+
+https://github.com/libp2p/rust-libp2p
+
+---
+
+# Why the Rust programming language?
+
+- Efficient but readable.
+- Strict types and strict ownership system.
+- Precise control over resources and resource use.
+- Can write bindings into Rust from other languages.
+
+# Characteristics of rust-libp2p
+
+- Based on the `futures` and `tokio` libraries for zero-cost user-space cooperative multitasking.
+- Can compile to asm.js and run in the browser.
+
+- API was designed to have the fewer runtime overhead possible, and is thus different than the
+  JavaScript and Go equivalents.
+- On the protocol level, should be compatible with the JS and Go implementations (modulo bugs or
+  misunderstandings in the protocol).
+
+---
+
+# Usage at Parity Technologies
+
+## Parity
+
+*Parity is a client for the Ethereum blockchain.*
+
+- Support for libp2p (in parallel to the current layer) currently being added in parallel.
+- Medium-term objective is to run Parity in a browser, which becomes possible with libp2p-websocket.
+- In the long term future, the Ethereum community may decide to make the switch to libp2p.
+
+## Polkadot
+
+*Polkadot is a next generation blockchain to be launched in 2019.*
+
+- Will be the primary networking layer of Polkadot.
+
+<div style="position: absolute; bottom: 5%; left: 5%;">
+.left[
+    <img src="polkadot.png" alt="Polkadot" height="32" />
+]
+</div>
+<div style="position: absolute; bottom: 5%; right: 5%;">
+.right[
+    <img src="parity-logo.png" alt="Parity" height="64" />
+]
+</div>
+---
+
+# State of the "standard" protocols
+
+Transports:
+
+- tcp &#9745;
+- websockets &#9745;
+- dns &#9745;
+
+Middlewares:
+
+- multistream-select &#9745;
+- secio &#9745; (only supports RSA with 2048bits+ keys)
+- plaintext &#9745;
+- mplex &#9745;
+
+Protocols:
+
+- floodsub: partial (no record signing)
+- identify &#9745;
+- kad: partial (not record store)
+- ping &#9745;
+- p2p-circuit: being implemented
+
+---
+class: center, middle
+
+# Demo time
+
+    </textarea>
+     <script src="remark.min.js">
+    </script>
+    <script>
+       var slideshow = remark.create();
+    </script>
+  </body>
+</html>
