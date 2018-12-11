@@ -68,35 +68,71 @@ Examples: BitTorent, Bitcoin.
 
 # How a decentralized system works
 
-Three components:
+A decentralized system is generally composed of three or four elements:
 
-- Discovery: we need to join the network.
-- Publish-Subscribe (PubSub): subscribe to topics.
-- Distributed Hash Table (DHT)
+- Each node has a *public key*.
+- A peer discovery system: how we join the network.
+- Optionally, a publish-subscribe system: how we broadcast events over the network.
+- Optionally, a distributed hash table (DHT): how we *store* data.
 
 ---
 
-# Component #1: peers discovery
+# Element #1: public keys
 
-We need to discover machines that are part of the network and how to reach them.
+The *identity* of a node on the network is its public key.
+
+Example:
+
+> - Hey! I'm *QmUtAhEaZjCczwvsEDZ2nj9QYFqjcZ9LacWit5P9juNqsC*. Who are you?
+> - I'm *QmNpMEWUKmo3PGnyphizqD9i21imhm2wFrfBxd5FDYnkNM*. Nice to meet you!
+
+The format of the public key can be RSA, ed25519, secp256k1, or any asymmetric encryption system.
+
+The public key of a node is strictly enforced by encrypting communications with it. Stealing
+a node's identity is impossible.
+
+---
+
+# Element #2: peers discovery
+
+In order to participate in a decentralized network, a machine first needs to discover the
+other machines that are part of the network, and how to reach them.
 
 Various methods:
 
-- Discover nodes on the local network through mDNS and DNS-SD.
+- Discover nodes on the local network through *mDNS* and *DNS-SD*.
 - The Internet is very large, so we need *bootstrap nodes*.
-- Once connected to some nodes, they can report the other nodes they are connected to.
+- When two nodes are connected, they can share to each other what they know about the rest of
+  the network.
 
 ---
 
-# Component #2: publish-subscribe
+# Element #3: publish-subscribe system (pub-sub)
 
-Propagate events through the network.
+Broadcast events through the network so that everyone receives them.
+
+Example usages:
+
+- With a chat application, chat messages are broadcasted on the network.
+- In blockchain technologies, a new transaction or a new block has been generated.
+- Announce yourself on the network so that other nodes connect to you.
+
+One big challenge is how to propagate messages:
+
+- Who do we connect to?
+- How much information do we store locally?
+TODO: expand
 
 ---
 
-# Component #3: distributed hash table
+# Element #4: distributed hash table (DHT)
 
-A hash table, but each node stores only a subset of it.
+Like a Rust `HashMap`, except that each node stores only a subset of it. The subset that they store
+is based on their `PeerId` (ie. their identity).
+
+The further away the hash of a value is, the less chances there is for us to store it.
+
+TODO: expand
 
 ---
 
