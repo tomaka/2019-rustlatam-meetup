@@ -46,76 +46,119 @@ a, a:hover, a:visited, a:active {
      <textarea id="source">
 class: center, middle
 
-# Rust libp2p project update
+# Libp2p, a Rust peer-to-peer library
 
-## October 2018
+## RustRush 2018
 
 https://github.com/libp2p/rust-libp2p
 
+<div style="position: absolute; bottom: 5%; right: 5%;">
+.right[
+    twitter.com/tomaka17 <img src="twitter.png" alt="Twitter" height="16" /><br />
+    github.com/tomaka <img src="github.png" alt="GitHub" height="16" /><br />
+]
+</div>
 ---
 
-# Major success: integrated in Substrate
+# Why we need decentralized technologies
 
-## Substrate
+Examples: BitTorent, Bitcoin.
 
-- Framework for building blockchains. Uses libp2p for its networking.
-- https://github.com/paritytech/substrate
-- Testnet running right now! https://telemetry.polkadot.io/
-- Protocols used: kademlia, identify, ping, "bbq" (a custom protocol)
+---
 
-<div style="position: absolute; bottom: 5%; right: 10%; left: 10%;">
-    <img src="bbq-birch.png" alt="The BBQ Birch test net" width="100%" />
+# How a decentralized system works
+
+Three components:
+
+- Discovery: we need to join the network.
+- Publish-Subscribe (PubSub): subscribe to topics.
+- Distributed Hash Table (DHT)
+
+---
+
+# Component #1: peers discovery
+
+We need to discover machines that are part of the network and how to reach them.
+
+Various methods:
+
+- Discover nodes on the local network through mDNS and DNS-SD.
+- The Internet is very large, so we need *bootstrap nodes*.
+- Once connected to some nodes, they can report the other nodes they are connected to.
+
+---
+
+# Component #2: publish-subscribe
+
+Propagate events through the network.
+
+---
+
+# Component #3: distributed hash table
+
+A hash table, but each node stores only a subset of it.
+
+---
+
+# Introducing libp2p!
+
+Libp2p is a library for decentralized applications.
+
+- Specifications managed by Protocol Labs (https://protocol.ai/).
+- See also https://libp2p.io/
+
+## Rust implementation
+
+- Managed by Parity Tech (https://www.parity.io/).
+- https://github.com/libp2p/rust-libp2p
+- Still under development, but version 0.1 should be published on crates.io beginning of next year.
+- Uses tokio for asynchronous networking.
+- Used in practice by Substrate: https://www.parity.io/substrate/
+- See the network in action: https://telemetry.polkadot.io/#/Krumme%20Lanke
+- Likely to be used by Ethereum 2.0 and by a growing number of projects in the blockchains ecosystem.
+
+---
+
+# Live demonstration
+
+*(assuming you have Cargo installed)*
+
+Install demo chat application:
+
+```sh
+cargo install --git https://github.com/tomaka/2018-rustrush-demo
+```
+
+Run it:
+
+```sh
+rustrush-demo
+```
+
+How it works:
+
+- Uses mDNS to discover nodes on the local network.
+- Maintains a connection to every single node it discovers.
+- Broadcasts sent messages to all the nodes it is connected to.
+
+**Warning**: Rust-libp2p has never been tested at a scale of more than ~80 nodes. May or may not
+work.
+
+---
+class: center, middle
+
+# Thank you!
+
+<div style="position: absolute; bottom: 5%; left: 5%;">
+.left[
+    (by the way, Parity is recruiting)
+]
 </div>
 
-## Polkadot
-
-- Polkadot will be based on Substrate.
-
----
-
-# Right now: big rework in progress
-
-## Initial design was too unpredictable
-
-- Realization back in July when integrating into Substrate.
-- Substrate network was not working well.
-- Summary: https://twitter.com/tomaka17/status/1048547869815394304
-
-## The rework: already done
-
-- 8,434 lines of code added and 2,362 deleted since Sep 1st.
-- Success! Fixed **all** the issues we had in substrate.
-- Made the network more predictable, less racy.
-
-## The rework: in progress
-
-- Objective: make the library easier to use (and thus also less bug-prone).
-- Not merged yet: 4,269 additions and 5,676 deletions.
-- Apologize in advance for the breaking changes to the people who were trying to use rust-libp2p.
-
----
-
-# Future work
-
-## Ethereum 2.0
-
-- Rust-libp2p hopefully to be used to write an Ethereum 2.0 client.
-- Prototype that uses rust-libp2p: https://github.com/sigp/lighthouse
-- Prototype that uses substrate: https://github.com/paritytech/shasper
-
-## Ethereum 1.0
-
-- *Maybe* for the light client of parity-ethereum.
-- Objective: run parity-ethereum in a browser.
-
-## Misc
-
-- Parity Tech will continue to maintain rust-libp2p
-- Will get non-Parity contributors on board.
-
-<div style="position: absolute; bottom: 5%; right: 42%;">
-.center[
-    <img src="parity-logo.png" alt="Parity" height="96" />
+<div style="position: absolute; bottom: 5%; right: 5%;">
+.right[
+    twitter.com/tomaka17 <img src="twitter.png" alt="Twitter" height="16" /><br />
+    github.com/tomaka <img src="github.png" alt="GitHub" height="16" /><br />
 ]
 </div>
 
