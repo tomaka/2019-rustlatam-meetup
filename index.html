@@ -60,13 +60,9 @@ https://github.com/libp2p/rust-libp2p
 </div>
 ---
 
-# Why we need decentralized technologies
-
-Examples: BitTorent, Bitcoin.
-
----
-
 # How a decentralized system works
+
+Examples of decentralized systems: BitTorent, Bitcoin, Ethereum.
 
 A decentralized system is generally composed of three or four elements:
 
@@ -86,10 +82,11 @@ Example:
 > - Hey! I'm *QmUtAhEaZjCczwvsEDZ2nj9QYFqjcZ9LacWit5P9juNqsC*. Who are you?
 > - I'm *QmNpMEWUKmo3PGnyphizqD9i21imhm2wFrfBxd5FDYnkNM*. Nice to meet you!
 
-The format of the public key can be RSA, ed25519, secp256k1, or any asymmetric encryption system.
+The format is a hash of an RSA public key, ed25519 public key, secp256k1 public key, or any
+asymmetric encryption system.
 
 The public key of a node is strictly enforced by encrypting communications with it. Stealing
-a node's identity is impossible.
+a node's identity is therefore impossible.
 
 ---
 
@@ -105,6 +102,8 @@ Various methods:
 - When two nodes are connected, they can share to each other what they know about the rest of
   the network.
 
+<div style="text-align: center;"><img src="discovery.svg" alt="" height="330" /></div>
+
 ---
 
 # Element #3: publish-subscribe system (pub-sub)
@@ -115,7 +114,7 @@ Example usages:
 
 - With a chat application, chat messages are broadcasted on the network.
 - In blockchain technologies, a new transaction or a new block has been generated.
-- Announce yourself on the network so that other nodes connect to you.
+- Spearding information about the topology of the network in order to improve connectivity.
 
 One big challenge is how to propagate messages:
 
@@ -125,14 +124,21 @@ TODO: expand
 
 ---
 
-# Element #4: distributed hash table (DHT)
+# Element #4: distributed hash table
 
-Like a Rust `HashMap`, except that each node stores only a subset of it. The subset that they store
-is based on their `PeerId` (ie. their identity).
+Most popular algorithm: **Kademlia**.
 
-The further away the hash of a value is, the less chances there is for us to store it.
+Like a Rust `HashMap`, except that each node only stores:
 
-TODO: expand
+- Up to 20 values whose hash is 1 bit away from their `PeerId`.
+- Up to 20 values whose hash is 2 bits away from their `PeerId`.
+- Up to 20 values whose hash is 3 bits away from their `PeerId`.
+- ...
+- Up to 20 values whose hash is 256 bits away from their `PeerId`.
+
+Storing or retreiving a value is done by contacting the nodes whose `PeerId` is closest to the value.
+
+<div style="text-align: center;"><img src="dht.svg" alt="" height="280" /></div>
 
 ---
 
@@ -140,17 +146,19 @@ TODO: expand
 
 Libp2p is a library for decentralized applications.
 
+https://libp2p.io/
+
 - Specifications managed by Protocol Labs (https://protocol.ai/).
-- See also https://libp2p.io/
+- Go and JS implementations used in production by IPFS (https://ipfs.io) and Filecoin (https://filecoin.io).
 
 ## Rust implementation
 
-- Managed by Parity Tech (https://www.parity.io/).
-- https://github.com/libp2p/rust-libp2p
-- Still under development, but version 0.1 should be published on crates.io beginning of next year.
+https://github.com/libp2p/rust-libp2p
+
+- Version 0.1 should be published on crates.io beginning of next year.
 - Uses tokio for asynchronous networking.
-- Used in practice by Substrate: https://www.parity.io/substrate/
-- See the network in action: https://telemetry.polkadot.io/#/Krumme%20Lanke
+- Used in practice by Substrate: https://www.parity.io/substrate/.
+  See the network in action: https://telemetry.polkadot.io/
 - Likely to be used by Ethereum 2.0 and by a growing number of projects in the blockchains ecosystem.
 
 <div style="position: absolute; bottom: 5%; right: 5%;">
@@ -160,7 +168,7 @@ Libp2p is a library for decentralized applications.
 </div>
 ---
 
-# Live demonstration
+# Live demonstration - Rust libp2p
 
 *(assuming you have Cargo installed)*
 
@@ -186,6 +194,73 @@ How it works:
 work.
 
 ---
+
+# Special characteristics of libp2p
+
+## Multiaddresses
+
+Represents how to reach out a node.
+
+Example of multiaddresses:
+
+- `/ip4/80.128.6.204/tcp/9000`
+- `/ip4/211.23.81.27/udp/5015/quic`
+- `/ip6/fe80::0202:b3ff:fe1e:8329/tcp/10350/ws`
+
+Supported protocols:
+
+- TCP/IP
+- WebSockets, for in-browser usage.
+- DNS
+- Unix Domain Sockets
+
+In the future?
+
+- QUIC
+- Bluetooth
+- Tor
+
+---
+
+# Special characteristics of libp2p
+
+## Wire-level overview
+
+Connecting two nodes follows this sequence of events:
+
+- They agree on an encryption protocol and perform a security handshake.
+- They agree on a multiplexing protocol.
+- Each high-level request (example: a DHT request, a pub-sub message being sent, etc.) opens a new
+  substream.
+
+<div style="text-align: center;"><img src="wire-proto.svg" alt="" height="220" /></div>
+
+---
+
+# Special characteristics of libp2p
+
+## Modular protocol negotiation
+
+Libp2p is not tied to any specific protocol. When two nodes connect, they always negotiate the
+protocols that they want to use.
+
+Example negotiation:
+
+```
+> Alice: /multistream/1.0.0
+> Alice: /secio/6.7.0
+> Bob: /multistream/1.0.0
+> Bob: /secio/6.7.0
+> Alice: *now speaking the secio protocol*
+> Bob: *now speaking the secio protocol*
+```
+
+This allows adding support for new protocols on a live network, and dropping support for deprecated
+protocols.
+
+Adding support for new protocols on a live network is awesome for performing experiments.
+
+---
 class: center, middle
 
 # Thank you!
@@ -202,6 +277,19 @@ class: center, middle
     github.com/tomaka <img src="github.png" alt="GitHub" height="16" /><br />
 ]
 </div>
+
+---
+
+# NAT traversal
+
+Currently being done:
+
+- We ask nodes we connect to what is the IP address that they observe for us.
+
+In the future:
+
+- UPnP (low priority because very unreliable)
+- Relaying connections: nodes can be asked to connect to a third party
 
     </textarea>
      <script src="remark.min.js">
