@@ -60,30 +60,37 @@ https://github.com/libp2p/rust-libp2p
 </div>
 ---
 
-# How a decentralized system works
+# What is libp2p?
 
-Examples of decentralized systems: BitTorent, Bitcoin, Ethereum.
+Libp2p is a library for creating decentralized peer-to-peer networks.
 
-A decentralized system is generally composed of three or four elements:
+## How a peer-to-peer network works
 
-- Each node has a *public key*.
+Examples of major peer-to-peer systems: BitTorent, Bitcoin, I2P, IPFS.
+
+A peer-to-peer system is generally composed of three or four elements:
+
+- Each node on the network is identified by its *public key*.
 - A peer discovery system: how we join the network.
 - Optionally, a publish-subscribe system: how we broadcast events over the network.
-- Optionally, a distributed hash table (DHT): how we *store* data.
+- Optionally, a distributed hash table (DHT): how we store data.
 
+<div style="position: absolute; bottom: 5%; left: 5%; right: 5%;">
+    <div style="text-align: center;"><img src="libp2p.png" alt="" height="160" /></div>
+</div>
 ---
 
 # Element #1: public keys
 
 The *identity* of a node on the network is its public key.
 
-Example:
+Example conversation:
 
-> - Hey! I'm *QmUtAhEaZjCczwvsEDZ2nj9QYFqjcZ9LacWit5P9juNqsC*. Who are you?
-> - I'm *QmNpMEWUKmo3PGnyphizqD9i21imhm2wFrfBxd5FDYnkNM*. Nice to meet you!
+- Hey! I'm *QmUtAhEaZjCczwvsEDZ2nj9QYFqjcZ9LacWit5P9juNqsC*. Who are you?
+- I'm *QmNpMEWUKmo3PGnyphizqD9i21imhm2wFrfBxd5FDYnkNM*. Nice to meet you!
 
-The format is a hash of an RSA public key, ed25519 public key, secp256k1 public key, or any
-asymmetric encryption system.
+The format is a hash of a small data structure containing an RSA public key, ed25519 public key,
+secp256k1 public key, or any asymmetric encryption system.
 
 The public key of a node is strictly enforced by encrypting communications with it. Stealing
 a node's identity is therefore impossible.
@@ -108,19 +115,16 @@ Various methods:
 
 # Element #3: publish-subscribe system (pub-sub)
 
-Broadcast events through the network so that everyone receives them.
+Broadcast events through the network so that everyone who is interested receives them.
 
 Example usages:
 
 - With a chat application, chat messages are broadcasted on the network.
 - In blockchain technologies, a new transaction or a new block has been generated.
-- Spearding information about the topology of the network in order to improve connectivity.
+- Spreading information about the topology of the network in order to improve connectivity.
 
-One big challenge is how to propagate messages:
-
-- Who do we connect to?
-- How much information do we store locally?
-TODO: expand
+Events typically include a *topic*. Only the nodes that have expressed their interest in a topic
+need to be notified.
 
 ---
 
@@ -144,7 +148,7 @@ Storing or retreiving a value is done by contacting the nodes whose `PeerId` is 
 
 # Introducing libp2p!
 
-Libp2p is a library for decentralized applications.
+Libp2p is a library for creating peer-to-peer networks.
 
 https://libp2p.io/
 
@@ -159,7 +163,7 @@ https://github.com/libp2p/rust-libp2p
 - Uses tokio for asynchronous networking.
 - Used in practice by Substrate: https://www.parity.io/substrate/.
   See the network in action: https://telemetry.polkadot.io/
-- Likely to be used by Ethereum 2.0 and by a growing number of projects in the blockchains ecosystem.
+- Likely to be used by Ethereum 2.0 and by a growing number of projects in the Ethereum ecosystem.
 
 <div style="position: absolute; bottom: 5%; right: 5%;">
 .right[
@@ -186,7 +190,8 @@ rustrush-demo
 
 How it works:
 
-- Uses mDNS to discover nodes on the local network.
+- Uses mDNS to discover nodes on the local network (also has a boostrap node, in case the venue's
+  WiFi doesn't allow mDNS).
 - Maintains a connection to every single node it discovers.
 - Broadcasts sent messages to all the nodes it is connected to.
 
@@ -207,7 +212,7 @@ Example of multiaddresses:
 - `/ip4/211.23.81.27/udp/5015/quic`
 - `/ip6/fe80::0202:b3ff:fe1e:8329/tcp/10350/ws`
 
-Supported protocols:
+Protocols supported by rust-libp2p:
 
 - TCP/IP
 - WebSockets, for in-browser usage.
@@ -216,7 +221,7 @@ Supported protocols:
 
 In the future?
 
-- QUIC
+- QUIC (very likely)
 - Bluetooth
 - Tor
 
@@ -224,12 +229,13 @@ In the future?
 
 # Special characteristics of libp2p
 
-## Wire-level overview
+## Wire protocol overview
 
 Connecting two nodes follows this sequence of events:
 
-- They agree on an encryption protocol and perform a security handshake.
-- They agree on a multiplexing protocol.
+- They open a connection using a transport (TCP/IP, Unix Domain Sockets, ...)
+- On top of this connection, they agree on an encryption protocol and perform a security handshake.
+- On top of the encryption layer, they agree on a multiplexing protocol.
 - Each high-level request (example: a DHT request, a pub-sub message being sent, etc.) opens a new
   substream.
 
