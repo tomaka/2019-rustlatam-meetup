@@ -1,6 +1,6 @@
-# Slides for presenting rust-libp2p
+# RustRush talk
 
-Lisbon, May 2018
+Moscow, December 2018
 
 ## How to read the slides
 
