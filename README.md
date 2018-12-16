@@ -1,4 +1,4 @@
-# RustRush talk
+# Parity meetup talk
 
 Moscow, December 2018
 
