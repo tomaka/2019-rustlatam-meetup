@@ -66,7 +66,7 @@ Libp2p is a protocol and framework for creating decentralized peer-to-peer netwo
 
 https://libp2p.io/
 
-- Used by Substream and Polkadot.
+- Used by Substrate and Polkadot.
   See the network in action: https://telemetry.polkadot.io/
 - Probably going to be used by Ethereum 2.0.
 - Specifications managed by Protocol Labs (https://protocol.ai/).
@@ -107,7 +107,7 @@ rustup update
 
 ## How BBQ-Birch and Polkadot work
 
-The network layer of Polkadot is composed of three elements:
+The network layer of BBQ-Birch Polkadot is composed of three elements:
 
 - Each node on the network is identified by its *public key*.
 - A peer discovery system: how we determine who is part of the network.
@@ -140,11 +140,10 @@ a node's identity is therefore impossible.
 In order to participate in a decentralized network, a machine first needs to discover the
 other machines that are part of the network, and how to reach them.
 
-Each node of the network stores:
+Nodes advertise themselves, then each node of the network stores:
 
 - Up to 20 nodes whose `PeerId` is 1 bit away from their `PeerId`.
 - Up to 20 nodes whose `PeerId` is 2 bits away from their `PeerId`.
-- Up to 20 nodes whose `PeerId` is 3 bits away from their `PeerId`.
 - ...
 - Up to 20 nodes whose `PeerId` is 256 bits away from their `PeerId`.
 
@@ -158,7 +157,7 @@ Reputation system:
 
 - Each node has a reputation level.
 - Bootstrap nodes (nodes provided by Parity (or the creator of the network)) start with the highest reputation.
-- Misbehaving on the network level lowers reputation.
+- Being offline or misbehaving on the network level lowers reputation.
 
 Broadcasting transactions and blocks:
 
@@ -170,12 +169,14 @@ Broadcasting transactions and blocks:
 
 # Libp2p within Substrate and Polkadot
 
+BBQ-Birch and Polkadot are not the same as Substrate.
+
 ## Customizability
 
-Libp2p is the network stack of Substrate, and it is designed to be customized.
+Libp2p is designed to be customizable.
 
 Substrate is a framework for creating your own blockchain. Your blockchain can require off-chain
-actions.
+actions. Libp2p can handle that.
 
 - Choose your own discovery method.
 - Choose your own pub-sub method.
@@ -286,12 +287,6 @@ Adding support for new protocols on a live network is awesome for performing exp
 class: center, middle
 
 # Thank you!
-
-<div style="position: absolute; bottom: 5%; left: 5%;">
-.left[
-    (by the way, Parity is recruiting)
-]
-</div>
 
 <div style="position: absolute; bottom: 5%; right: 5%;">
 .right[
