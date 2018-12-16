@@ -46,9 +46,9 @@ a, a:hover, a:visited, a:active {
      <textarea id="source">
 class: center, middle
 
-# Libp2p, a Rust peer-to-peer library
+# Libp2p
 
-## RustRush 2018
+## Parity meetup, Moscow 2018
 
 https://github.com/libp2p/rust-libp2p
 
@@ -62,18 +62,56 @@ https://github.com/libp2p/rust-libp2p
 
 # What is libp2p?
 
-Libp2p is a library for creating decentralized peer-to-peer networks.
+Libp2p is a protocol and framework for creating decentralized peer-to-peer networks.
 
-## How a peer-to-peer network works
+https://libp2p.io/
 
-Examples of major peer-to-peer systems: BitTorent, Bitcoin, I2P, IPFS.
+- Used by Substream and Polkadot.
+  See the network in action: https://telemetry.polkadot.io/
+- Probably going to be used by Ethereum 2.0.
+- Specifications managed by Protocol Labs (https://protocol.ai/).
+- Go and JS implementations used in production by IPFS (https://ipfs.io) and Filecoin (https://filecoin.io).
 
-A peer-to-peer system is generally composed of three or four elements:
+## Rust implementation
+
+https://github.com/libp2p/rust-libp2p
+
+- Version 0.1 should be published on crates.io beginning of next year.
+- Uses tokio for asynchronous networking.
+
+<div style="position: absolute; bottom: 5%; right: 5%;">
+.right[
+    <img src="parity-logo.png" alt="ParityTech" height="100" />
+]
+</div>
+
+---
+
+# Live demonstration ahead
+
+*(if you have Rust and Cargo installed)*
+
+Install demo chat application:
+
+```sh
+cargo install --git https://github.com/tomaka/2018-rustrush-demo
+```
+
+**Note**: If you have an error message about libp2p not found, you need to update your version of Rust:
+
+```sh
+rustup update
+```
+
+---
+
+## How BBQ-Birch and Polkadot work
+
+The network layer of Polkadot is composed of three elements:
 
 - Each node on the network is identified by its *public key*.
-- A peer discovery system: how we join the network.
-- Optionally, a publish-subscribe system: how we broadcast events over the network.
-- Optionally, a distributed hash table (DHT): how we store data.
+- A peer discovery system: how we determine who is part of the network.
+- A reputation system: determine who we broadcast messages to.
 
 <div style="position: absolute; bottom: 5%; left: 5%; right: 5%;">
     <div style="text-align: center;"><img src="libp2p.png" alt="" height="160" /></div>
@@ -102,74 +140,49 @@ a node's identity is therefore impossible.
 In order to participate in a decentralized network, a machine first needs to discover the
 other machines that are part of the network, and how to reach them.
 
-Various methods:
+Each node of the network stores:
 
-- Discover nodes on the local network through *mDNS* and *DNS-SD*.
-- The Internet is very large, so we need *bootstrap nodes*.
-- When two nodes are connected, they can share to each other what they know about the rest of
-  the network.
+- Up to 20 nodes whose `PeerId` is 1 bit away from their `PeerId`.
+- Up to 20 nodes whose `PeerId` is 2 bits away from their `PeerId`.
+- Up to 20 nodes whose `PeerId` is 3 bits away from their `PeerId`.
+- ...
+- Up to 20 nodes whose `PeerId` is 256 bits away from their `PeerId`.
 
 <div style="text-align: center;"><img src="discovery.svg" alt="" height="330" /></div>
 
 ---
 
-# Element #3: publish-subscribe system (pub-sub)
+# Element #3: reputation system
 
-Broadcast events through the network so that everyone who is interested receives them.
+Reputation system:
 
-Example usages:
+- Each node has a reputation level.
+- Bootstrap nodes (nodes provided by Parity (or the creator of the network)) start with the highest reputation.
+- Misbehaving on the network level lowers reputation.
 
-- With a chat application, chat messages are broadcasted on the network.
-- In blockchain technologies, a new transaction or a new block has been generated.
-- Spreading information about the topology of the network in order to improve connectivity.
+Broadcasting transactions and blocks:
 
-Events typically include a *topic*. Only the nodes that have expressed their interest in a topic
-need to be notified.
-
----
-
-# Element #4: distributed hash table
-
-Most popular algorithm: **Kademlia**.
-
-Like a Rust `HashMap`, except that each node only stores:
-
-- Up to 20 values whose hash is 1 bit away from their `PeerId`.
-- Up to 20 values whose hash is 2 bits away from their `PeerId`.
-- Up to 20 values whose hash is 3 bits away from their `PeerId`.
-- ...
-- Up to 20 values whose hash is 256 bits away from their `PeerId`.
-
-Storing or retreiving a value is done by contacting the nodes whose `PeerId` is closest to the value.
-
-<div style="text-align: center;"><img src="dht.svg" alt="" height="280" /></div>
+- On startup, we connect to a random set of nodes.
+- A connection is maintained with the nodes with the highest reputation.
+- We broadcast transactions and blocks to the nodes we are connected to.
 
 ---
 
-# Introducing libp2p!
+# Libp2p within Substrate and Polkadot
 
-Libp2p is a library for creating peer-to-peer networks.
+## Customizability
 
-https://libp2p.io/
+Libp2p is the network stack of Substrate, and it is designed to be customized.
 
-- Specifications managed by Protocol Labs (https://protocol.ai/).
-- Go and JS implementations used in production by IPFS (https://ipfs.io) and Filecoin (https://filecoin.io).
+Substrate is a framework for creating your own blockchain. Your blockchain can require off-chain
+actions.
 
-## Rust implementation
+- Choose your own discovery method.
+- Choose your own pub-sub method.
+- Choose your own DHT algorithm.
 
-https://github.com/libp2p/rust-libp2p
+Even if your blockchain is connected to Polkadot, all of this is *in parallel* to Polkadot.
 
-- Version 0.1 should be published on crates.io beginning of next year.
-- Uses tokio for asynchronous networking.
-- Used in practice by Substrate: https://www.parity.io/substrate/.
-  See the network in action: https://telemetry.polkadot.io/
-- Likely to be used by Ethereum 2.0 and by a growing number of projects in the Ethereum ecosystem.
-
-<div style="position: absolute; bottom: 5%; right: 5%;">
-.right[
-    <img src="parity-logo.png" alt="ParityTech" height="100" />
-]
-</div>
 ---
 
 # Live demonstration - Rust libp2p
@@ -180,6 +193,12 @@ Install demo chat application:
 
 ```sh
 cargo install --git https://github.com/tomaka/2018-rustrush-demo
+```
+
+**Note**: If you have an error message about libp2p not found, you need to update your version of Rust:
+
+```sh
+rustup update
 ```
 
 Run it:
@@ -194,9 +213,6 @@ How it works:
   WiFi doesn't allow mDNS).
 - Maintains a connection to every single node it discovers.
 - Broadcasts sent messages to all the nodes it is connected to.
-
-**Warning**: Rust-libp2p has never been tested at a scale of more than ~80 nodes. May or may not
-work.
 
 ---
 
