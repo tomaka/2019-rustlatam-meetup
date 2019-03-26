@@ -46,9 +46,11 @@ a, a:hover, a:visited, a:active {
      <textarea id="source">
 class: center, middle
 
-# Libp2p
+# How we compiled libp2p into WASM
 
-## Parity meetup, Moscow 2018
+TODO: find original title
+
+## Rust meetup - Montevideo, March 2019
 
 https://github.com/libp2p/rust-libp2p
 
@@ -60,24 +62,24 @@ https://github.com/libp2p/rust-libp2p
 </div>
 ---
 
-# What is libp2p?
+# Introduction: what is libp2p?
 
-Libp2p is a protocol and framework for creating decentralized peer-to-peer networks.
+<div style="position: absolute; bottom: 5%; right: 5%;">
+.right[
+    <img src="parity-logo.png" alt="ParityTech" height="100" />
+]
+</div>
+---
+
+# Introduction: what is libp2p?
+
+Libp2p is a protocol and library for creating decentralized peer-to-peer networks.
 
 https://libp2p.io/
 
-- Used by Substrate and Polkadot.
-  See the network in action: https://telemetry.polkadot.io/
-- Probably going to be used by Ethereum 2.0.
-- Specifications managed by Protocol Labs (https://protocol.ai/).
-- Go and JS implementations used in production by IPFS (https://ipfs.io) and Filecoin (https://filecoin.io).
-
-## Rust implementation
-
-https://github.com/libp2p/rust-libp2p
-
-- Version 0.1 should be published on crates.io beginning of next year.
-- Uses tokio for asynchronous networking.
+- Used by IPFS, Filecoin, Substrate, Polkadot.
+- Probably going to be used by Ethereum 2.0 and a large number of projects in the Ethereum space.
+- Designed and managed by Protocol Labs (https://protocol.ai/).
 
 <div style="position: absolute; bottom: 5%; right: 5%;">
 .right[
@@ -87,201 +89,413 @@ https://github.com/libp2p/rust-libp2p
 
 ---
 
-# Live demonstration ahead
+# Introduction: what is libp2p?
 
-*(if you have Rust and Cargo installed)*
+Libp2p is a protocol and library for creating decentralized peer-to-peer networks.
 
-Install demo chat application:
+https://libp2p.io/
 
-```sh
-cargo install --git https://github.com/tomaka/2018-rustrush-demo
-```
+- Used by IPFS, Filecoin, Polkadot, Ethereum 2.0, and others.
+- Designed and managed by Protocol Labs (https://protocol.ai/).
 
-**Note**: If you have an error message about libp2p not found, you need to update your version of Rust:
+## Rust implementation
 
-```sh
-rustup update
-```
+*What this talk is about.*
 
----
+https://github.com/libp2p/rust-libp2p
 
-## How BBQ-Birch and Polkadot work
-
-The network layer of BBQ-Birch Polkadot is composed of three elements:
-
-- Each node on the network is identified by its *public key*.
-- A peer discovery system: how we determine who is part of the network.
-- A reputation system: determine who we broadcast messages to.
-
-<div style="position: absolute; bottom: 5%; left: 5%; right: 5%;">
-    <div style="text-align: center;"><img src="libp2p.png" alt="" height="160" /></div>
+<div style="position: absolute; bottom: 5%; right: 5%;">
+.right[
+    <img src="parity-logo.png" alt="ParityTech" height="100" />
+]
 </div>
----
-
-# Element #1: public keys
-
-The *identity* of a node on the network is its public key.
-
-Example conversation:
-
-- Hey! I'm *QmUtAhEaZjCczwvsEDZ2nj9QYFqjcZ9LacWit5P9juNqsC*. Who are you?
-- I'm *QmNpMEWUKmo3PGnyphizqD9i21imhm2wFrfBxd5FDYnkNM*. Nice to meet you!
-
-The format is a hash of a small data structure containing an RSA public key, ed25519 public key,
-secp256k1 public key, or any asymmetric encryption system.
-
-The public key of a node is strictly enforced by encrypting communications with it. Stealing
-a node's identity is therefore impossible.
 
 ---
 
-# Element #2: peers discovery
+# Rust libp2p implementation
 
-In order to participate in a decentralized network, a machine first needs to discover the
-other machines that are part of the network, and how to reach them.
+https://github.com/libp2p/rust-libp2p
 
-Nodes advertise themselves, then each node of the network stores:
-
-- Up to 20 nodes whose `PeerId` is 1 bit away from their `PeerId`.
-- Up to 20 nodes whose `PeerId` is 2 bits away from their `PeerId`.
-- ...
-- Up to 20 nodes whose `PeerId` is 256 bits away from their `PeerId`.
-
-<div style="text-align: center;"><img src="discovery.svg" alt="" height="330" /></div>
+- Started in October 2017, mainly by Parity.
+- Currently at version 0.5 on crates.io.
 
 ---
 
-# Element #3: reputation system
+# Rust libp2p implementation
 
-Reputation system:
+https://github.com/libp2p/rust-libp2p
 
-- Each node has a reputation level.
-- Bootstrap nodes (nodes provided by Parity (or the creator of the network)) start with the highest reputation.
-- Being offline or misbehaving on the network level lowers reputation.
+- Started in October 2017, mainly by Parity.
+- Currently at version 0.5 on crates.io.
+- Uses tokio.
 
-Broadcasting transactions and blocks:
+---
+# Why compile it to WASM?
 
-- On startup, we connect to a random set of nodes.
-- A connection is maintained with the nodes with the highest reputation.
-- We broadcast transactions and blocks to the nodes we are connected to.
+---
+# Why compile it to WASM?
+
+<div style="position: absolute; top: 25%;">
+So that we can use it from within a browser!
+</div>
+
+---
+# Why compile it to WASM?
+
+<div style="position: absolute; top: 25%;">
+So that we can use it from within a browser!
+</div>
+
+<div style="position: absolute; top: 45%;">
+And that is <em>cool</em>.
+</div>
 
 ---
 
-# Libp2p within Substrate and Polkadot
-
-BBQ-Birch and Polkadot are not the same as Substrate.
-
-## Customizability
-
-Libp2p is designed to be customizable.
-
-Substrate is a framework for creating your own blockchain. Your blockchain can require off-chain
-actions. Libp2p can handle that.
-
-- Choose your own discovery method.
-- Choose your own pub-sub method.
-- Choose your own DHT algorithm.
-
-Even if your blockchain is connected to Polkadot, all of this is *in parallel* to Polkadot.
+# First attempt: through emscripten, end of 2017
 
 ---
 
-# Live demonstration - Rust libp2p
+# First attempt: through emscripten, end of 2017
 
-*(assuming you have Cargo installed)*
-
-Install demo chat application:
-
-```sh
-cargo install --git https://github.com/tomaka/2018-rustrush-demo
-```
-
-**Note**: If you have an error message about libp2p not found, you need to update your version of Rust:
-
-```sh
-rustup update
-```
-
-Run it:
-
-```sh
-rustrush-demo
-```
-
-How it works:
-
-- Uses mDNS to discover nodes on the local network (also has a boostrap node, in case the venue's
-  WiFi doesn't allow mDNS).
-- Maintains a connection to every single node it discovers.
-- Broadcasts sent messages to all the nodes it is connected to.
+- Modified `libp2p-websocket` to include a `BrowserWsConfig` struct that uses `stdweb`.
+- Compile to binary, and emscripten generates JavaScript and WASM files.
 
 ---
 
-# Special characteristics of libp2p
+# First attempt: through emscripten, end of 2017
 
-## Multiaddresses
-
-Represents how to reach out a node.
-
-Example of multiaddresses:
-
-- `/ip4/80.128.6.204/tcp/9000`
-- `/ip4/211.23.81.27/udp/5015/quic`
-- `/ip6/fe80::0202:b3ff:fe1e:8329/tcp/10350/ws`
-
-Protocols supported by rust-libp2p:
-
-- TCP/IP
-- WebSockets, for in-browser usage.
-- DNS
-- Unix Domain Sockets
-
-In the future?
-
-- QUIC (very likely)
-- Bluetooth
-- Tor
+- Modified `libp2p-websocket` to include a `BrowserWsConfig` struct that uses `stdweb`.
+- Compile to binary, and emscripten generates JavaScript and WASM files.
+- Problem: what polls the `Future`? There's no `tokio` runtime available.
 
 ---
 
-# Special characteristics of libp2p
+# First attempt: through emscripten, end of 2017
 
-## Wire protocol overview
-
-Connecting two nodes follows this sequence of events:
-
-- They open a connection using a transport (TCP/IP, Unix Domain Sockets, ...)
-- On top of this connection, they agree on an encryption protocol and perform a security handshake.
-- On top of the encryption layer, they agree on a multiplexing protocol.
-- Each high-level request (example: a DHT request, a pub-sub message being sent, etc.) opens a new
-  substream.
-
-<div style="text-align: center;"><img src="wire-proto.svg" alt="" height="220" /></div>
+- Modified `libp2p-websocket` to include a `BrowserWsConfig` struct that uses `stdweb`.
+- Compile to binary, and emscripten generates JavaScript and WASM files.
+- Problem: what polls the `Future`? There's no `tokio` runtime available.
+- Solution: custom polling code. TODO find gist
 
 ---
 
-# Special characteristics of libp2p
+# First attempt: through emscripten, end of 2017
 
-## Modular protocol negotiation
+- Modified `libp2p-websocket` to include a `BrowserWsConfig` struct that uses `stdweb`.
+- Compile to binary, and emscripten generates JavaScript and WASM files.
+- Problem: what polls the `Future`? There's no `tokio` runtime available.
+- Solution: custom polling code. TODO find gist
 
-Libp2p is not tied to any specific protocol. When two nodes connect, they always negotiate the
-protocols that they want to use.
+A more general problem is:
 
-Example negotiation:
+- We had no idea how to properly do that.
 
-```
-> Alice: /multistream/1.0.0
-> Alice: /secio/6.7.0
-> Bob: /multistream/1.0.0
-> Bob: /secio/6.7.0
-> Alice: *now speaking the secio protocol*
-> Bob: *now speaking the secio protocol*
-```
+---
 
-This allows adding support for new protocols on a live network, and dropping support for deprecated
-protocols.
+# First attempt: through emscripten, end of 2017
 
-Adding support for new protocols on a live network is awesome for performing experiments.
+- Modified `libp2p-websocket` to include a `BrowserWsConfig` struct that uses `stdweb`.
+- Compile to binary, and emscripten generates JavaScript and WASM files.
+- Problem: what polls the `Future`? There's no `tokio` runtime available.
+- Solution: custom polling code. TODO find gist
+
+A more general problem is:
+
+- We had no idea how to properly do that.
+- But nobody in the world had any idea how to do that.
+
+---
+
+# Second attempt: since end of 2018
+
+- Attempt to make it work for real.
+
+---
+
+# Second attempt: since end of 2018
+
+- Attempt to make it work for real.
+
+## Let's ditch Emscripten
+
+- Let's use `wasm-bindgen` instead!
+- <s>Emscripten</s> => Wasm
+- <s>Compiling into a binary</s> => Compile into a WASM library<br/>This library is usable from JavaScript.
+- No `main` function.
+
+TODO: add schema binary => library
+
+---
+
+# Second attempt: since end of 2018
+
+Didn't go as planned!
+
+---
+
+# Second attempt: since end of 2018
+
+Didn't go as planned!
+
+## Issue #1
+
+- The `ring` library doesn't compile!
+- `ring` uses inline assembly, and obviously doesn't have a WASM or JavaScript
+implementation.
+
+---
+
+# Second attempt: since end of 2018
+
+Didn't go as planned!
+
+## Issue #1
+
+- The `ring` library doesn't compile!
+- `ring` uses inline assembly, and obviously doesn't have a WASM or JavaScript
+implementation.
+
+Solution:
+
+- Replaced as much cryptographic code as possible with pure Rust libraries, which might or might
+  not be a good idea.
+- No pure Rust code for Elliptic Curve Diffie-Hellman, so rewrote it with WebCrypto using
+  wasm-bindgen.
+
+---
+
+# Second attempt: since end of 2018
+
+Didn't go as planned!
+
+## Issue #2
+
+- Compiling failed with obscure error about files being in the wrong format.
+- Bug somewhere in the C code compilation. C libraries don't properly compile to WASM at the moment.
+
+---
+
+# Second attempt: since end of 2018
+
+Didn't go as planned!
+
+## Issue #2
+
+- Compiling failed with obscure error about files being in the wrong format.
+- Bug somewhere in the C code compilation. C libraries don't properly compile to WASM at the moment.
+
+Solution:
+
+- Had to replace `secp256k1` (bindings to a C library) with `rust-secp256k1` (pure Rust).
+- Had to directly depend on the `clear_on_drop` crate in order to enable the `no_cc` feature.
+
+---
+
+# Second attempt: since end of 2018
+
+Didn't go as planned!
+
+## Issue #3
+
+- Compilation failed with some obscure missing symbols.
+- It turns out that `stdweb` and `wasm-bindgen` don't well go together. They are two different
+ecosystems.
+
+---
+
+# Second attempt: since end of 2018
+
+Didn't go as planned!
+
+## Issue #3
+
+- Compilation failed with some obscure missing symbols.
+- It turns out that `stdweb` and `wasm-bindgen` don't well go together. They are two different
+ecosystems.
+
+Solution:
+
+- Had to rewrite the websocket code to use `wasm-bindgen` and `web-sys`, instead of `stdweb`.
+
+---
+
+# Second attempt: since end of 2018
+
+Finally compiled!
+
+---
+
+# Second attempt: since end of 2018
+
+Finally compiled! But doesn't run!
+
+---
+
+# Second attempt: since end of 2018
+
+Finally compiled! But doesn't run!
+
+## Issue #4
+
+- Panic when generating a random number with the `rand` crate.
+
+---
+
+# Second attempt: since end of 2018
+
+Finally compiled! But doesn't run!
+
+## Issue #4
+
+- Panic when generating a random number with the `rand` crate.
+
+Solution:
+
+- Had to depend on `rand` and activate the `wasm-bindgen` feature flag.
+- A lot of crates have an obscure feature flag that really shouldn't be an optional feature in an
+ideal world.
+
+---
+
+# Second attempt: since end of 2018
+
+Finally compiled! But doesn't run!
+
+## Issue #5
+
+- Panics when calling `Instant::now()`.
+
+---
+
+# Second attempt: since end of 2018
+
+Finally compiled! But doesn't run!
+
+## Issue #5
+
+- Panics when calling `Instant::now()`.
+- Problem: the `std` crate is available for wasm32-unknown-unknown, but panics whenever you try
+  to do any I/O.
+
+---
+
+# Second attempt: since end of 2018
+
+Finally compiled! But doesn't run!
+
+## Issue #5
+
+- Panics when calling `Instant::now()`.
+- Problem: the `std` crate is available for wasm32-unknown-unknown, but panics whenever you try
+  to do I/O.
+
+Solution:
+
+- Had to write a `wasm-time` crate. Everything that uses `std::time::Instant` uses
+`wasm_time::Instant` instead.
+- `wasm_time::Instant::now()` calls `window.performance().now()` in JavaScript.
+
+---
+
+# Second attempt: since end of 2018
+
+Finally compiled! But doesn't run!
+
+## Issue #6
+
+- Errors when using `tokio_timer::Delay` or `tokio_timer::Interval`, because no tokio context is
+  set.
+
+---
+
+# Second attempt: since end of 2018
+
+Finally compiled! But doesn't run!
+
+## Issue #6
+
+- Errors when using `tokio_timer::Delay` or `tokio_timer::Interval`, because no tokio context is
+set.
+- When you call `tokio::run` (or use a tokio runtime in general), tokio puts a `Clock` object in
+a TLS that is then retreived by `tokio_timer`. If this value is lacking, it errors.
+
+---
+
+# Second attempt: since end of 2018
+
+Finally compiled! But doesn't run!
+
+## Issue #6
+
+- Errors when using `tokio_timer::Delay` or `tokio_timer::Interval`, because no tokio context is
+set.
+- When you call `tokio::run` (or use a tokio runtime in general), tokio puts a `Clock` object in
+a TLS that is then retreived by `tokio_timer`. If this value is lacking, it errors.
+
+Solution:
+
+- Added mock `tokio_timer` equivalents in `wasm-time`, that use `setTimeout`.
+
+---
+
+# Second attempt: since end of 2018
+
+Finally compiled! But doesn't run!
+
+## Issue #7
+
+- Wanted to try against IPFS nodes, but IPFS uses RSA.
+- No pure Rust RSA implementation!
+
+---
+
+# Second attempt: since end of 2018
+
+Finally compiled! But doesn't run!
+
+## Issue #7
+
+- Wanted to try against IPFS nodes, but IPFS uses RSA.
+- No pure Rust RSA implementation!
+
+Solution:
+
+- [Not done yet] Use WebCrypto for RSA.
+
+---
+
+# Second attempt: since end of 2018
+
+Finally compiled! But doesn't run!
+
+## Issue #8
+
+- "out of memory" error on Firefox. No backtrace or any indication of the location.
+
+---
+
+# Second attempt: since end of 2018
+
+Finally compiled! But doesn't run!
+
+## Issue #8
+
+- "out of memory" error on Firefox. No backtrace or any indication of the location.
+
+Solution:
+
+- Use Chrome 🤷
+
+---
+
+# Second attempt: since end of 2018
+
+Finally ran!
+
+---
+
+# Live demonstration ahead
 
 ---
 class: center, middle
@@ -294,19 +508,6 @@ class: center, middle
     github.com/tomaka <img src="github.png" alt="GitHub" height="16" /><br />
 ]
 </div>
-
----
-
-# NAT traversal
-
-Currently being done:
-
-- We ask nodes we connect to what is the IP address that they observe for us.
-
-In the future:
-
-- UPnP (low priority because very unreliable)
-- Relaying connections: nodes can be asked to connect to a third party
 
     </textarea>
      <script src="remark.min.js">
