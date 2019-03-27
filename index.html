@@ -46,9 +46,7 @@ a, a:hover, a:visited, a:active {
      <textarea id="source">
 class: center, middle
 
-# How we compiled libp2p into WASM
-
-TODO: find original title
+# How we compiled libp2p into WASM and made it run in the browser
 
 ## Rust meetup - Montevideo, March 2019
 
@@ -77,8 +75,7 @@ Libp2p is a protocol and library for creating decentralized peer-to-peer network
 
 https://libp2p.io/
 
-- Used by IPFS, Filecoin, Substrate, Polkadot.
-- Probably going to be used by Ethereum 2.0 and a large number of projects in the Ethereum space.
+- Used by IPFS, Filecoin, Polkadot, Ethereum 2.0, and others.
 - Designed and managed by Protocol Labs (https://protocol.ai/).
 
 <div style="position: absolute; bottom: 5%; right: 5%;">
@@ -114,29 +111,68 @@ https://github.com/libp2p/rust-libp2p
 
 # Rust libp2p implementation
 
+## More details
+
 https://github.com/libp2p/rust-libp2p
 
-- Started in October 2017, mainly by Parity.
+- Started in October 2017 by Parity.
+
+---
+
+# Rust libp2p implementation
+
+## More details
+
+https://github.com/libp2p/rust-libp2p
+
+- Started in October 2017 by Parity.
 - Currently at version 0.5 on crates.io.
 
 ---
 
 # Rust libp2p implementation
 
+## More details
+
 https://github.com/libp2p/rust-libp2p
 
-- Started in October 2017, mainly by Parity.
+- Started in October 2017 by Parity.
 - Currently at version 0.5 on crates.io.
-- Uses tokio.
+- Uses tokio for asynchronous networking.
+
+---
+
+# Rust libp2p implementation
+
+## More details
+
+https://github.com/libp2p/rust-libp2p
+
+- Started in October 2017 by Parity.
+- Currently at version 0.5 on crates.io.
+- Uses tokio for asynchronous networking.
+- Used by Substrate and Polkadot. See it live: https://telemetry.polkadot.io/
 
 ---
 # Why compile it to WASM?
+
+<div style="position: absolute; bottom: 2%; left: 45%;">
+.left[
+    <img src="web-assembly.png" alt="WASM" height="100" />
+]
+</div>
 
 ---
 # Why compile it to WASM?
 
 <div style="position: absolute; top: 25%;">
 So that we can use it from within a browser!
+</div>
+
+<div style="position: absolute; bottom: 2%; left: 45%;">
+.left[
+    <img src="web-assembly.png" alt="WASM" height="100" />
+]
 </div>
 
 ---
@@ -150,10 +186,21 @@ So that we can use it from within a browser!
 And that is <em>cool</em>.
 </div>
 
+<div style="position: absolute; bottom: 2%; left: 45%;">
+.left[
+    <img src="web-assembly.png" alt="WASM" height="100" />
+]
+</div>
+    
 ---
 
 # First attempt: through emscripten, end of 2017
 
+<div style="position: absolute; bottom: 5%; right: 5%;">
+.right[
+    <img src="emscripten.png" alt="Emscripten" height="60" />
+]
+</div>
 ---
 
 # First attempt: through emscripten, end of 2017
@@ -161,6 +208,11 @@ And that is <em>cool</em>.
 - Modified `libp2p-websocket` to include a `BrowserWsConfig` struct that uses `stdweb`.
 - Compile to binary, and emscripten generates JavaScript and WASM files.
 
+<div style="position: absolute; bottom: 5%; right: 5%;">
+.right[
+    <img src="emscripten.png" alt="Emscripten" height="60" />
+]
+</div>
 ---
 
 # First attempt: through emscripten, end of 2017
@@ -169,6 +221,11 @@ And that is <em>cool</em>.
 - Compile to binary, and emscripten generates JavaScript and WASM files.
 - Problem: what polls the `Future`? There's no `tokio` runtime available.
 
+<div style="position: absolute; bottom: 5%; right: 5%;">
+.right[
+    <img src="emscripten.png" alt="Emscripten" height="60" />
+]
+</div>
 ---
 
 # First attempt: through emscripten, end of 2017
@@ -176,8 +233,13 @@ And that is <em>cool</em>.
 - Modified `libp2p-websocket` to include a `BrowserWsConfig` struct that uses `stdweb`.
 - Compile to binary, and emscripten generates JavaScript and WASM files.
 - Problem: what polls the `Future`? There's no `tokio` runtime available.
-- Solution: custom polling code. TODO find gist
+- Solution: custom polling code. https://gist.github.com/tomaka/25e0f01c427a1bce0e0ddb10d278ead9
 
+<div style="position: absolute; bottom: 5%; right: 5%;">
+.right[
+    <img src="emscripten.png" alt="Emscripten" height="60" />
+]
+</div>
 ---
 
 # First attempt: through emscripten, end of 2017
@@ -185,12 +247,17 @@ And that is <em>cool</em>.
 - Modified `libp2p-websocket` to include a `BrowserWsConfig` struct that uses `stdweb`.
 - Compile to binary, and emscripten generates JavaScript and WASM files.
 - Problem: what polls the `Future`? There's no `tokio` runtime available.
-- Solution: custom polling code. TODO find gist
+- Solution: custom polling code. https://gist.github.com/tomaka/25e0f01c427a1bce0e0ddb10d278ead9
 
 A more general problem is:
 
 - We had no idea how to properly do that.
 
+<div style="position: absolute; bottom: 5%; right: 5%;">
+.right[
+    <img src="emscripten.png" alt="Emscripten" height="60" />
+]
+</div>
 ---
 
 # First attempt: through emscripten, end of 2017
@@ -198,13 +265,20 @@ A more general problem is:
 - Modified `libp2p-websocket` to include a `BrowserWsConfig` struct that uses `stdweb`.
 - Compile to binary, and emscripten generates JavaScript and WASM files.
 - Problem: what polls the `Future`? There's no `tokio` runtime available.
-- Solution: custom polling code. TODO find gist
+- Solution: custom polling code. https://gist.github.com/tomaka/25e0f01c427a1bce0e0ddb10d278ead9
 
 A more general problem is:
 
 - We had no idea how to properly do that.
 - But nobody in the world had any idea how to do that.
 
+<img src="venn-2017.png" alt="Venn diagram" height="200" />
+
+<div style="position: absolute; bottom: 5%; right: 5%;">
+.right[
+    <img src="emscripten.png" alt="Emscripten" height="60" />
+]
+</div>
 ---
 
 # Second attempt: since end of 2018
@@ -216,6 +290,16 @@ A more general problem is:
 # Second attempt: since end of 2018
 
 - Attempt to make it work for real.
+
+<img src="venn-2018.png" alt="Venn diagram" height="200" />
+
+---
+
+# Second attempt: since end of 2018
+
+- Attempt to make it work for real.
+
+<img src="venn-2018.png" alt="Venn diagram" height="200" />
 
 ## Let's ditch Emscripten
 
@@ -223,8 +307,6 @@ A more general problem is:
 - <s>Emscripten</s> => Wasm
 - <s>Compiling into a binary</s> => Compile into a WASM library<br/>This library is usable from JavaScript.
 - No `main` function.
-
-TODO: add schema binary => library
 
 ---
 
@@ -494,8 +576,9 @@ Solution:
 Finally ran!
 
 ---
+class: center, middle
 
-# Live demonstration ahead
+# Live demonstration
 
 ---
 class: center, middle
